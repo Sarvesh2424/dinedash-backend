@@ -24,7 +24,8 @@ const DishSchema = new Schema({
   variants: {
     type: Array<String>,
     default: [],
-  }
+  },
+  prepTime: { type: Number, required: true },
 });
 
 export const Dish = mongoose.model("Dish", DishSchema);
