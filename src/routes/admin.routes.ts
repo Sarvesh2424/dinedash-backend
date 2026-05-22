@@ -17,9 +17,11 @@ import { DishSchema } from "../schemas/dish.schema";
 import { OfferSchema } from "../schemas/offer.schema";
 import { CourierSchema } from "../schemas/courier.schema";
 import { FlashDealSchema } from "../schemas/flashDeal.schema";
+import { getDishesController } from "../controllers/dish.controller";
 
 const router = Router();
 
+router.get("/get-dishes", getDishesController);
 router.post("/add-dish", validate(DishSchema), addDishController);
 router.put("/update-dish/:dishId", updateDishController);
 router.delete("/delete-dish/:dishId", deleteDishController);

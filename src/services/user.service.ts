@@ -3,6 +3,8 @@ import { AppError } from "../common/errors/api-error";
 import { StatusCodes } from "../common/errors/statusCodes";
 import { Dish } from "../models/Dish.model";
 import { Order } from "../models/Order.model";
+import { User } from "../models/User.models";
+import { ICartItem } from "../schemas/user.schema";
 
 interface IOrder {
   userId: string;
@@ -49,6 +51,45 @@ export const placeOrder = async (data: IOrder) => {
       error instanceof Error ? error.message : "Unknown order engine failure";
     throw new AppError(
       `Order Processing Aborted: ${message}`,
+      StatusCodes.BAD_REQUEST,
+    );
+  }
+};
+
+export const updateUserCart = async (
+  userId: string | string[],
+  incomingCartItems: ICartItem[],
+) => {
+  try {
+    // 1. Data Integrity Validation: Check that every item in the cart exists
+    for (const item of incomingCartItems) {
+      const parentDishExists = await Dish.findOne({ dishId: item.dishId });
+
+      if (!parentDishExists) {
+        throw new AppError(
+          `Cart Integrity Failure: Referenced item ID '${item.dishId}' is invalid or no longer exists.`,
+          StatusCodes.NOT_FOUND,
+        );
+      }
+    }
+
+    // Perform atomic update operation on the target user's cart field
+    const updatedUser = await User.findOneAndUpdate(
+      { userId: userId },
+      { $set: { cart: incomingCartItems } },
+      { new: true, runValidators: true }, // Returns modified doc, running types checking evaluations
+    );
+
+    return updatedUser;
+  } catch (error: unknown) {
+    if (error instanceof AppError) throw error;
+
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Unknown database modification fault";
+    throw new AppError(
+      `Error syncing shopping cart status: ${message}`,
       StatusCodes.BAD_REQUEST,
     );
   }
