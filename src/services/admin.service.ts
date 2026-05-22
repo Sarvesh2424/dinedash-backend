@@ -9,6 +9,10 @@ import { ICourier } from "../schemas/courier.schema";
 import { FlashDeal } from "../models/FlashDeal.model";
 import { IFlashDeal } from "../schemas/flashDeal.schema";
 import { Order } from "../models/Order.model";
+import { Ticket } from "../models/Ticket.model";
+import { ITicket } from "../schemas/ticket.schema";
+import { Restaurant } from "../models/Restaurant.model";
+import { IRestaurant } from "../schemas/restaurant.schema";
 
 type DishCategory =
   | "Signature Plates"
@@ -315,6 +319,102 @@ export const updateOrderStatus = async (
         : "Unknown database modification fault";
     throw new AppError(
       `Error modifying order progress state: ${message}`,
+      StatusCodes.BAD_REQUEST,
+    );
+  }
+};
+
+export const raiseTicket = async (data: ITicket) => {
+  try {
+    // Data Integrity Check: If an order invoice is referenced, verify it exists
+    if (data.orderReference) {
+      const parentOrderExists = await Order.findOne({
+        orderId: data.orderReference,
+      });
+
+      if (!parentOrderExists) {
+        throw new AppError(
+          `Integrity Verification Failure: Referenced order reference ID '${data.orderReference}' does not exist.`,
+          StatusCodes.NOT_FOUND,
+        );
+      }
+    }
+
+    const ticketId = v4();
+
+    const newTicket = new Ticket({ ticketId, ...data });
+    await newTicket.save();
+
+    return newTicket;
+  } catch (error: unknown) {
+    if (error instanceof AppError) throw error;
+
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Unknown support database transaction error";
+    throw new AppError(
+      `Failed to log support ticket: ${message}`,
+      StatusCodes.BAD_REQUEST,
+    );
+  }
+};
+
+export const updateTicket = async (
+  ticketId: string | string[],
+  data: Partial<ITicket>,
+) => {
+  try {
+    // Append a fresh system runtime timestamp to track this modification event
+    const modifiedPayload = {
+      ...data,
+      updatedAt: new Date(),
+    };
+
+    // Execute atomic update operation matching against our unique string ticketId
+    const updatedTicket = await Ticket.findOneAndUpdate(
+      { ticketId: ticketId },
+      { $set: modifiedPayload },
+      { new: true, runValidators: true }, // Returns the modified object and enforces enum lookups
+    );
+
+    return updatedTicket;
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Unknown database mutation fault";
+    throw new AppError(
+      `Failed to modify ticket record state: ${message}`,
+      StatusCodes.BAD_REQUEST,
+    );
+  }
+};
+
+export const updateRestaurantProfile = async (
+  restaurantId: string | string[],
+  data: Partial<IRestaurant>,
+) => {
+  try {
+    const finalUpdatePayload = { ...data };
+
+    const updatedRestaurant = await Restaurant.findOneAndUpdate(
+      { restaurantId: restaurantId },
+      { $set: finalUpdatePayload },
+      { new: true, runValidators: true },
+    );
+
+    if (updatedRestaurant) {
+      const cleanRestaurantObj = updatedRestaurant.toObject();
+      return cleanRestaurantObj;
+    }
+
+    return null;
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Unknown database patch fault";
+    throw new AppError(
+      `Failed to modify merchant profile state configurations: ${message}`,
       StatusCodes.BAD_REQUEST,
     );
   }

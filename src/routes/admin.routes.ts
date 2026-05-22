@@ -8,9 +8,12 @@ import {
   deleteDishController,
   deleteFlashDealController,
   deleteOfferController,
+  raiseTicketController,
   updateCourierController,
   updateDishController,
   updateOrderController,
+  updateRestaurantController,
+  updateTicketController,
 } from "../controllers/admin.controller";
 import { validate } from "../middlewares/validate.middleware";
 import { DishSchema } from "../schemas/dish.schema";
@@ -18,6 +21,7 @@ import { OfferSchema } from "../schemas/offer.schema";
 import { CourierSchema } from "../schemas/courier.schema";
 import { FlashDealSchema } from "../schemas/flashDeal.schema";
 import { getDishesController } from "../controllers/dish.controller";
+import { TicketSchema } from "../schemas/ticket.schema";
 
 const router = Router();
 
@@ -41,5 +45,10 @@ router.post(
 router.delete("/delete-flashDeal/:flashDealId", deleteFlashDealController);
 
 router.put("/update-order/:orderId", updateOrderController);
+
+router.post("/raise-ticket", validate(TicketSchema), raiseTicketController);
+router.put("/update-ticket/:ticketId", updateTicketController);
+
+router.put("/update-restaurant/:restaurantId", updateRestaurantController);
 
 export default router;

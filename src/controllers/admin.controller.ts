@@ -12,9 +12,12 @@ import {
   deleteDish,
   deleteFlashDeal,
   deleteOffer,
+  raiseTicket,
   updateCourier,
   updateDish,
   updateOrderStatus,
+  updateRestaurantProfile,
+  updateTicket,
 } from "../services/admin.service";
 import { v4 } from "uuid";
 
@@ -268,20 +271,105 @@ export const updateOrderController = asyncHandler(
     const { status } = req.body;
 
     if (!orderId) {
-      throw new AppError("Order ID parameter is required", StatusCodes.BAD_REQUEST);
+      throw new AppError(
+        "Order ID parameter is required",
+        StatusCodes.BAD_REQUEST,
+      );
     }
 
     if (!status) {
-      throw new AppError("New order status value is required", StatusCodes.BAD_REQUEST);
+      throw new AppError(
+        "New order status value is required",
+        StatusCodes.BAD_REQUEST,
+      );
     }
 
     // Call service layer to process status transitions safely
     const updatedOrder = await updateOrderStatus(orderId, status);
 
     if (!updatedOrder) {
-      throw new AppError("Target order record not found", StatusCodes.NOT_FOUND);
+      throw new AppError(
+        "Target order record not found",
+        StatusCodes.NOT_FOUND,
+      );
     }
 
     returnSuccessResponse(res, StatusCodes.OK, updatedOrder);
+  },
+);
+
+export const raiseTicketController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { subject, source, issueType, priority, orderReference, message } =
+      req.body;
+
+    const newTicket = await raiseTicket({
+      subject,
+      source,
+      issueType,
+      priority,
+      status: "Open",
+      orderReference,
+      message,
+      updatedAt: new Date(),
+    });
+
+    returnSuccessResponse(res, StatusCodes.CREATED, newTicket);
+  },
+);
+
+export const updateTicketController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { ticketId } = req.params;
+    const { status, priority, message, subject } = req.body;
+
+    if (!ticketId) {
+      throw new AppError("Ticket ID path variable is required", StatusCodes.BAD_REQUEST);
+    }
+
+    const updatedTicket = await updateTicket(ticketId, {
+      status,
+      priority,
+      message,
+      subject,
+    });
+
+    if (!updatedTicket) {
+      throw new AppError("Target support ticket profile not found", StatusCodes.NOT_FOUND);
+    }
+
+    returnSuccessResponse(
+      res, 
+      StatusCodes.OK, 
+      updatedTicket, 
+    );
+  }
+);
+
+export const updateRestaurantController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { restaurantId } = req.params;
+
+    const updatePayload = req.body;
+
+    if (!restaurantId) {
+      throw new AppError("Restaurant ID path parameter tracking slug is required", StatusCodes.BAD_REQUEST);
+    }
+
+    if (!updatePayload || Object.keys(updatePayload).length === 0) {
+      throw new AppError("Update payload content data block cannot be empty", StatusCodes.BAD_REQUEST);
+    }
+
+    const updatedRestaurant = await updateRestaurantProfile(restaurantId, updatePayload);
+
+    if (!updatedRestaurant) {
+      throw new AppError("Target restaurant profile not found", StatusCodes.NOT_FOUND);
+    }
+
+    returnSuccessResponse(
+      res, 
+      StatusCodes.OK, 
+      updatedRestaurant, 
+    );
   }
 );
