@@ -10,6 +10,7 @@ import {
   deleteOfferController,
   updateCourierController,
   updateDishController,
+  updateOrderController,
 } from "../controllers/admin.controller";
 import { validate } from "../middlewares/validate.middleware";
 import { DishSchema } from "../schemas/dish.schema";
@@ -36,5 +37,7 @@ router.post(
   addFlashDealController,
 );
 router.delete("/delete-flashDeal/:flashDealId", deleteFlashDealController);
+
+router.put("/update-order/:orderId", updateOrderController);
 
 export default router;

@@ -8,6 +8,7 @@ import { Courier } from "../models/Courier.model";
 import { ICourier } from "../schemas/courier.schema";
 import { FlashDeal } from "../models/FlashDeal.model";
 import { IFlashDeal } from "../schemas/flashDeal.schema";
+import { Order } from "../models/Order.model";
 
 type DishCategory =
   | "Signature Plates"
@@ -277,6 +278,43 @@ export const deleteFlashDeal = async (flashDealId: string | string[]) => {
       error instanceof Error ? error.message : "Unknown data tier malfunction";
     throw new AppError(
       `Database exception wiping flash deal record: ${message}`,
+      StatusCodes.BAD_REQUEST,
+    );
+  }
+};
+
+const ALLOWED_STATUSES = ["New", "Preparing", "Ready", "Completed", "Rejected"];
+
+export const updateOrderStatus = async (
+  orderId: string | string[],
+  newStatus: string,
+) => {
+  try {
+    // Guard against random strings passing into our database enum fields
+    if (!ALLOWED_STATUSES.includes(newStatus)) {
+      throw new AppError(
+        `Invalid status value. Allowed choices are: ${ALLOWED_STATUSES.join(", ")}`,
+        StatusCodes.BAD_REQUEST,
+      );
+    }
+
+    // Perform atomic update operation
+    const updatedOrder = await Order.findOneAndUpdate(
+      { orderId: orderId },
+      { $set: { status: newStatus } },
+      { new: true, runValidators: true }, // Returns the newly modified object state
+    );
+
+    return updatedOrder;
+  } catch (error: unknown) {
+    if (error instanceof AppError) throw error;
+
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Unknown database modification fault";
+    throw new AppError(
+      `Error modifying order progress state: ${message}`,
       StatusCodes.BAD_REQUEST,
     );
   }

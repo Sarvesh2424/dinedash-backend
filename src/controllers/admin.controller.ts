@@ -14,6 +14,7 @@ import {
   deleteOffer,
   updateCourier,
   updateDish,
+  updateOrderStatus,
 } from "../services/admin.service";
 import { v4 } from "uuid";
 
@@ -259,4 +260,28 @@ export const deleteFlashDealController = asyncHandler(
       flashDealId,
     });
   },
+);
+
+export const updateOrderController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    if (!orderId) {
+      throw new AppError("Order ID parameter is required", StatusCodes.BAD_REQUEST);
+    }
+
+    if (!status) {
+      throw new AppError("New order status value is required", StatusCodes.BAD_REQUEST);
+    }
+
+    // Call service layer to process status transitions safely
+    const updatedOrder = await updateOrderStatus(orderId, status);
+
+    if (!updatedOrder) {
+      throw new AppError("Target order record not found", StatusCodes.NOT_FOUND);
+    }
+
+    returnSuccessResponse(res, StatusCodes.OK, updatedOrder);
+  }
 );
