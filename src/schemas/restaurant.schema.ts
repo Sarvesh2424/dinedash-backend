@@ -50,6 +50,10 @@ export const RestaurantSchema = z.object({
     // Full week array validation scheme layout parameters mapping
     workingHours: z.array(WorkingDayZodSchema).default([]),
     menu: z.array(z.string()).default([]),
+    offers: z.array(z.string()).default([]),
+    dishes: z.array(z.string()).default([]),
+    couriers: z.array(z.string()).default([]),
+    tickets: z.array(z.string()).default([]),
   }),
 });
 

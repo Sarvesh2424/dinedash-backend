@@ -15,6 +15,7 @@ const OfferSchema = new Schema({
   minimumOrder: { type: Number },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
+  restaurantId: { type: String, ref: "Restaurant", required: true },
 });
 
 export const Offer = mongoose.model("Offer", OfferSchema);

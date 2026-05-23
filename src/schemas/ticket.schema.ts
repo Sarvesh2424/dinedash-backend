@@ -32,6 +32,7 @@ export const TicketSchema = z.object({
       ),
 
     updatedAt: z.coerce.date().default(() => new Date()),
+    restaurantId: z.string(),
   }),
 });
 

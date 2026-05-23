@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
+const AddOnSchema = new Schema({
+  name: { type: String, ref: "Dish", required: true },
+  price: { type: Number, required: true },
+});
+
 const DishSchema = new Schema({
   dishId: { type: String, required: true },
   name: { type: String, required: true },
@@ -25,7 +30,9 @@ const DishSchema = new Schema({
     type: Array<String>,
     default: [],
   },
+  addOns: { type: [AddOnSchema], default: [] },
   prepTime: { type: Number, required: true },
+  restaurantId: { type: String, required: true },
 });
 
 export const Dish = mongoose.model("Dish", DishSchema);

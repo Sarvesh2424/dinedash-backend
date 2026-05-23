@@ -23,28 +23,27 @@ type DishCategory =
   | "Drinks";
 
 interface IDish {
-  dishId: string;
   name: string;
   price: number;
   category: DishCategory;
   description?: string; // Optional field
   variants: string[];
+  addOns: { name: string; price: number }[];
   prepTime: number;
+  restaurantId: string;
 }
 
 export const addDish = async (data: IDish) => {
   try {
-    const existingDish = await Dish.findOne({
-      email: data.dishId,
-    });
-    if (existingDish) {
-      throw new AppError(
-        "Email already exists. Please use a different email or add a + [organisation name] to your email.",
-        StatusCodes.CONFLICT,
-      );
-    }
+    const dishId = v4();
+    const restaurant = await Restaurant.findOneAndUpdate(
+      { restaurantId: data.restaurantId },
+      { $push: { dishes: dishId } },
+      { new: true },
+    );
 
     const dataToSave = {
+      dishId,
       ...data,
     };
     const newDish = new Dish(dataToSave);
@@ -85,6 +84,20 @@ export const deleteDish = async (dishId: string | string[]) => {
   try {
     const deletedDish = await Dish.findOneAndDelete({ dishId: dishId });
 
+    if (!deletedDish) {
+      throw new AppError(
+        "No offer dound by the given id",
+        StatusCodes.NOT_FOUND,
+      );
+    }
+
+    const restaurant = await Restaurant.findOneAndUpdate(
+      {
+        restaurantId: deletedDish.restaurantId,
+      },
+      { $pull: { dishes: dishId } },
+    );
+
     return deletedDish; // Will return null if no dish matched the dishId
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";
@@ -108,6 +121,12 @@ export const addOffer = async (data: IOffer) => {
     }
 
     const offerId = v4();
+
+    const restaurant = await Restaurant.findOneAndUpdate(
+      { restaurantId: data.restaurantId },
+      { $push: { offers: offerId } },
+      { new: true },
+    );
 
     // Construct the Mongoose entity and commit it safely
     const newOffer = new Offer({ offerId, ...data });
@@ -133,6 +152,20 @@ export const deleteOffer = async (offerId: string | string[]) => {
   try {
     const deletedOffer = await Offer.findOneAndDelete({ offerId: offerId });
 
+    if (!deletedOffer) {
+      throw new AppError(
+        "No offer dound by the given id",
+        StatusCodes.NOT_FOUND,
+      );
+    }
+
+    const restaurant = await Restaurant.findOneAndUpdate(
+      {
+        restaurantId: deletedOffer.restaurantId,
+      },
+      { $pull: { offers: offerId } },
+    );
+
     return deletedOffer; // Will return null to the controller if no offer matched
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";
@@ -155,6 +188,12 @@ export const addCourier = async (data: ICourier) => {
     }
 
     const courierId = v4();
+
+    const restaurant = await Restaurant.findOneAndUpdate(
+      { restaurantId: data.restaurantId },
+      { $push: { couriers: courierId } },
+      { new: true },
+    );
 
     // Assemble and commit to database
     const newCourier = new Courier({ courierId, ...data });
@@ -222,6 +261,20 @@ export const deleteCourier = async (courierId: string | string[]) => {
     const deletedCourier = await Courier.findOneAndDelete({
       courierId: courierId,
     });
+
+    if (!deletedCourier) {
+      throw new AppError(
+        "No offer dound by the given id",
+        StatusCodes.NOT_FOUND,
+      );
+    }
+
+    const restaurant = await Restaurant.findOneAndUpdate(
+      {
+        restaurantId: deletedCourier.restaurantId,
+      },
+      { $pull: { couriers: courierId } },
+    );
     return deletedCourier;
   } catch (error: unknown) {
     const message =
@@ -341,6 +394,12 @@ export const raiseTicket = async (data: ITicket) => {
     }
 
     const ticketId = v4();
+
+    const restaurant = await Restaurant.findOneAndUpdate(
+      { restaurantId: data.restaurantId },
+      { $push: { tickets: ticketId } },
+      { new: true },
+    );
 
     const newTicket = new Ticket({ ticketId, ...data });
     await newTicket.save();

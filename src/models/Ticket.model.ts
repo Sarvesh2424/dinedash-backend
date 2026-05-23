@@ -35,6 +35,7 @@ const TicketSchema = new Schema({
   orderReference: { type: String, ref: "Order" },
   message: { type: String, required: true },
   updatedAt: { type: Date, default: Date.now() },
+  restaurantId: { type: String, required: true },
 });
 
 export const Ticket = mongoose.model("Ticket", TicketSchema);

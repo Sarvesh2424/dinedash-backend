@@ -14,6 +14,7 @@ const CourierSchema = new Schema({
   mobile: { type: String, required: true },
   rating: { type: Number, default: 0.0 },
   image: { type: String },
+  restaurantId: { type: String, required: true },
 });
 
 export const Courier = mongoose.model("Courier", CourierSchema);

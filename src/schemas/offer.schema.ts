@@ -10,6 +10,7 @@ export const OfferSchema = z
       minimumOrder: z.number().nonnegative().optional(),
       startDate: z.coerce.date(),
       endDate: z.coerce.date(),
+      restaurantId: z.string(),
     }),
   })
   // Custom Validation: Ensures the data makes logical sense based on the type

@@ -19,21 +19,29 @@ import {
   updateRestaurantProfile,
   updateTicket,
 } from "../services/admin.service";
-import { v4 } from "uuid";
 
 export const addDishController = asyncHandler(
   async (req: Request, res: Response) => {
-    const { name, price, category, variants, description, prepTime } = req.body;
-    const dishId = v4();
-
-    const newEditor = await addDish({
+    const {
       name,
-      dishId,
       price,
       category,
       variants,
+      addOns,
       description,
       prepTime,
+      restaurantId,
+    } = req.body;
+
+    const newEditor = await addDish({
+      name,
+      price,
+      category,
+      variants,
+      addOns,
+      description,
+      prepTime,
+      restaurantId,
     });
     returnSuccessResponse(res, StatusCodes.CREATED, newEditor);
   },
@@ -110,6 +118,7 @@ export const addOfferController = asyncHandler(
       minimumOrder,
       startDate,
       endDate,
+      restaurantId,
     } = req.body;
 
     const newOffer = await addOffer({
@@ -120,6 +129,7 @@ export const addOfferController = asyncHandler(
       minimumOrder,
       startDate,
       endDate,
+      restaurantId,
     });
 
     returnSuccessResponse(res, StatusCodes.CREATED, newOffer);
@@ -155,7 +165,7 @@ export const deleteOfferController = asyncHandler(
 
 export const addCourierController = asyncHandler(
   async (req: Request, res: Response) => {
-    const { name, status, mobile, rating, image } = req.body;
+    const { name, status, mobile, rating, image, restaurantId } = req.body;
 
     const newCourier = await addCourier({
       name,
@@ -163,6 +173,7 @@ export const addCourierController = asyncHandler(
       mobile,
       rating: rating ?? 0.0, // Ensures default fallback if not explicitly provided
       image,
+      restaurantId,
     });
 
     returnSuccessResponse(res, StatusCodes.CREATED, newCourier);
@@ -300,8 +311,15 @@ export const updateOrderController = asyncHandler(
 
 export const raiseTicketController = asyncHandler(
   async (req: Request, res: Response) => {
-    const { subject, source, issueType, priority, orderReference, message } =
-      req.body;
+    const {
+      subject,
+      source,
+      issueType,
+      priority,
+      orderReference,
+      message,
+      restaurantId,
+    } = req.body;
 
     const newTicket = await raiseTicket({
       subject,
@@ -312,6 +330,7 @@ export const raiseTicketController = asyncHandler(
       orderReference,
       message,
       updatedAt: new Date(),
+      restaurantId,
     });
 
     returnSuccessResponse(res, StatusCodes.CREATED, newTicket);
@@ -324,7 +343,10 @@ export const updateTicketController = asyncHandler(
     const { status, priority, message, subject } = req.body;
 
     if (!ticketId) {
-      throw new AppError("Ticket ID path variable is required", StatusCodes.BAD_REQUEST);
+      throw new AppError(
+        "Ticket ID path variable is required",
+        StatusCodes.BAD_REQUEST,
+      );
     }
 
     const updatedTicket = await updateTicket(ticketId, {
@@ -335,15 +357,14 @@ export const updateTicketController = asyncHandler(
     });
 
     if (!updatedTicket) {
-      throw new AppError("Target support ticket profile not found", StatusCodes.NOT_FOUND);
+      throw new AppError(
+        "Target support ticket profile not found",
+        StatusCodes.NOT_FOUND,
+      );
     }
 
-    returnSuccessResponse(
-      res, 
-      StatusCodes.OK, 
-      updatedTicket, 
-    );
-  }
+    returnSuccessResponse(res, StatusCodes.OK, updatedTicket);
+  },
 );
 
 export const updateRestaurantController = asyncHandler(
@@ -353,23 +374,31 @@ export const updateRestaurantController = asyncHandler(
     const updatePayload = req.body;
 
     if (!restaurantId) {
-      throw new AppError("Restaurant ID path parameter tracking slug is required", StatusCodes.BAD_REQUEST);
+      throw new AppError(
+        "Restaurant ID path parameter tracking slug is required",
+        StatusCodes.BAD_REQUEST,
+      );
     }
 
     if (!updatePayload || Object.keys(updatePayload).length === 0) {
-      throw new AppError("Update payload content data block cannot be empty", StatusCodes.BAD_REQUEST);
+      throw new AppError(
+        "Update payload content data block cannot be empty",
+        StatusCodes.BAD_REQUEST,
+      );
     }
 
-    const updatedRestaurant = await updateRestaurantProfile(restaurantId, updatePayload);
+    const updatedRestaurant = await updateRestaurantProfile(
+      restaurantId,
+      updatePayload,
+    );
 
     if (!updatedRestaurant) {
-      throw new AppError("Target restaurant profile not found", StatusCodes.NOT_FOUND);
+      throw new AppError(
+        "Target restaurant profile not found",
+        StatusCodes.NOT_FOUND,
+      );
     }
 
-    returnSuccessResponse(
-      res, 
-      StatusCodes.OK, 
-      updatedRestaurant, 
-    );
-  }
+    returnSuccessResponse(res, StatusCodes.OK, updatedRestaurant);
+  },
 );

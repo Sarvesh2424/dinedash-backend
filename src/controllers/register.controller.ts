@@ -45,7 +45,11 @@ export const registerRestaurantController = asyncHandler(
       accountNumber,
       routing,
       workingHours: workingHours ?? [], // Fallback to an empty array if hours aren't provided yet
-      menu:[]
+      menu: [],
+      offers: [],
+      dishes: [],
+      couriers: [],
+      tickets: [],
     });
 
     returnSuccessResponse(res, StatusCodes.CREATED, newRestaurant);

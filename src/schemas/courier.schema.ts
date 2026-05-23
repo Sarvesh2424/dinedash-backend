@@ -8,10 +8,7 @@ export const CourierSchema = z.object({
     mobile: z
       .string()
       .min(1, "Mobile number is required")
-      .regex(
-        /^\+?[1-9]\d{1,14}$|^[0-9]{10}$/,
-        "Invalid mobile number format"
-      ),
+      .regex(/^\+?[1-9]\d{1,14}$|^[0-9]{10}$/, "Invalid mobile number format"),
 
     rating: z
       .number()
@@ -21,6 +18,7 @@ export const CourierSchema = z.object({
 
     // Expects a valid image asset URL string if provided
     image: z.string().url("Image must be a valid URL").optional(),
+    restaurantId: z.string(),
   }),
 });
 

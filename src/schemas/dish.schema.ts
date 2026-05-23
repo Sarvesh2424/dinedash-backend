@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+export const AddOnZodSchema = z.object({
+  name: z.string(),
+  price: z.number().positive("Price must be greater than 0"),
+});
+
 export const DishSchema = z.object({
   body: z.object({
     name: z.string().min(1),
@@ -16,6 +21,8 @@ export const DishSchema = z.object({
       .default("Signature Plates"),
     description: z.string().optional(),
     variants: z.array(z.string()).default([]),
+    addOns: z.array(AddOnZodSchema).default([]),
     prepTime: z.number().positive(),
+    restaurantId: z.string(),
   }),
 });
