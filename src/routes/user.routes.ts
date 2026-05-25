@@ -1,5 +1,7 @@
 import { Router } from "express";
 import {
+  getOrdersController,
+  getRestaurantsController,
   placeOrderController,
   updateCartController,
 } from "../controllers/user.controller";
@@ -10,6 +12,7 @@ import { getOffersController } from "../controllers/offer.controller";
 
 const router = Router();
 
+router.get("/get-orders", getOrdersController);
 router.post("/place-order", validate(OrderSchema), placeOrderController);
 
 router.get("/get-dishes", getDishesController);
@@ -17,5 +20,7 @@ router.get("/get-dishes", getDishesController);
 router.put("/update-cart/:userId", updateCartController);
 
 router.get("/get-offers", getOffersController);
+
+router.get("/get-restaurants", getRestaurantsController);
 
 export default router;

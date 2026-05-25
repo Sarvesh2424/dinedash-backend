@@ -35,8 +35,9 @@ const RestaurantSchema = new Schema({
   menu: { type: [String], default: [] },
   offers: { type: [String], ref: "Offer", default: [] },
   dishes: { type: [String], ref: "Dish", default: [] },
-  couriers:{ type: [String], ref: "Courier", default: [] },
-  tickets:{ type: [String], ref: "Ticket", default: [] },
+  couriers: { type: [String], ref: "Courier", default: [] },
+  tickets: { type: [String], ref: "Ticket", default: [] },
+  images: { type: [String], default: [] },
 });
 
 export const Restaurant = mongoose.model("Restaurant", RestaurantSchema);

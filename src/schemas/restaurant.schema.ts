@@ -54,6 +54,7 @@ export const RestaurantSchema = z.object({
     dishes: z.array(z.string()).default([]),
     couriers: z.array(z.string()).default([]),
     tickets: z.array(z.string()).default([]),
+    images: z.array(z.string()).default([]),
   }),
 });
 

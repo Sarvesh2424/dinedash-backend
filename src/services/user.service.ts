@@ -5,6 +5,7 @@ import { Dish } from "../models/Dish.model";
 import { Order } from "../models/Order.model";
 import { User } from "../models/User.models";
 import { ICartItem } from "../schemas/user.schema";
+import { Restaurant } from "../models/Restaurant.model";
 
 interface IOrder {
   userId: string;
@@ -90,6 +91,42 @@ export const updateUserCart = async (
         : "Unknown database modification fault";
     throw new AppError(
       `Error syncing shopping cart status: ${message}`,
+      StatusCodes.BAD_REQUEST,
+    );
+  }
+};
+
+export const getAllRestaurants = async (filters: Record<string, any> = {}) => {
+  try {
+    // Execute lookup query while strictly protecting sensitive data fields
+    const restaurants = await Restaurant.find(filters)
+      .select("-password -accountHolder -accountNumber -routing") // Security projection filter
+      .lean(); // Optimizes query memory footprint for read-only streams
+
+    return restaurants;
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Unknown database read error";
+    throw new AppError(
+      `Failed to compile restaurant directory listings: ${message}`,
+      StatusCodes.BAD_REQUEST,
+    );
+  }
+};
+
+export const getAllOrders = async (filters: Record<string, any> = {}) => {
+  try {
+    // Execute lookup query, sorting by newest records first
+    const orders = await Order.find(filters)
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return orders;
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Unknown database read error";
+    throw new AppError(
+      `Failed to compile order ledger summaries: ${message}`,
       StatusCodes.BAD_REQUEST,
     );
   }
