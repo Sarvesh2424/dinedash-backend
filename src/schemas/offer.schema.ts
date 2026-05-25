@@ -5,11 +5,14 @@ export const OfferSchema = z
     body: z.object({
       promoCode: z.string().min(1),
       type: z.enum(["Flat Amount", "Percent"]),
+      name: z.string().min(1),
+      description: z.string().optional(),
       amountOff: z.number().positive().optional(),
       percentOff: z.number().min(1).max(100).optional(),
       minimumOrder: z.number().nonnegative().optional(),
       startDate: z.coerce.date(),
       endDate: z.coerce.date(),
+      image: z.string().optional(),
       restaurantId: z.string(),
     }),
   })

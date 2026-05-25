@@ -10,11 +10,14 @@ const OfferSchema = new Schema({
     enum: ["Flat Amount", "Percent"],
     required: true,
   },
+  name: { type: String, required: true },
+  description: { type: String },
   amountOff: { type: Number },
   percentOff: { type: Number },
   minimumOrder: { type: Number },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
+  image: { type: String },
   restaurantId: { type: String, ref: "Restaurant", required: true },
 });
 

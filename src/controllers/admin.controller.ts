@@ -118,22 +118,28 @@ export const addOfferController = asyncHandler(
     const {
       promoCode,
       type,
+      name,
+      description,
       amountOff,
       percentOff,
       minimumOrder,
       startDate,
       endDate,
+      image,
       restaurantId,
     } = req.body;
 
     const newOffer = await addOffer({
       promoCode,
       type,
+      name,
+      description,
       amountOff,
       percentOff,
       minimumOrder,
       startDate,
       endDate,
+      image,
       restaurantId,
     });
 
