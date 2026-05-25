@@ -38,6 +38,7 @@ const RestaurantSchema = new Schema({
   couriers: { type: [String], ref: "Courier", default: [] },
   tickets: { type: [String], ref: "Ticket", default: [] },
   images: { type: [String], default: [] },
+  rating: { type: Number, default: 0.0 },
 });
 
 export const Restaurant = mongoose.model("Restaurant", RestaurantSchema);

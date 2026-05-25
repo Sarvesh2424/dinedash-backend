@@ -51,6 +51,7 @@ export const registerRestaurantController = asyncHandler(
       couriers: [],
       tickets: [],
       images: [],
+      rating: 0.0,
     });
 
     returnSuccessResponse(res, StatusCodes.CREATED, newRestaurant);
