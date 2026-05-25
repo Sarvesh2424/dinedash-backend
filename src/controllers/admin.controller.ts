@@ -18,6 +18,7 @@ import {
   updateOrderStatus,
   updateRestaurantProfile,
   updateTicket,
+  uploadAndCompressImage,
 } from "../services/admin.service";
 
 export const addDishController = asyncHandler(
@@ -30,6 +31,8 @@ export const addDishController = asyncHandler(
       addOns,
       description,
       prepTime,
+      rating,
+      image,
       restaurantId,
     } = req.body;
 
@@ -41,6 +44,8 @@ export const addDishController = asyncHandler(
       addOns,
       description,
       prepTime,
+      rating,
+      image,
       restaurantId,
     });
     returnSuccessResponse(res, StatusCodes.CREATED, newEditor);
@@ -400,5 +405,21 @@ export const updateRestaurantController = asyncHandler(
     }
 
     returnSuccessResponse(res, StatusCodes.OK, updatedRestaurant);
+  },
+);
+
+export const uploadImageController = asyncHandler(
+  async (req: Request, res: Response) => {
+    // Check if the Multer parsing engine populated the file interceptor object
+    if (!req.file) {
+      throw new AppError(
+        "No file detected. Please attach an image under the 'image' field key.",
+        StatusCodes.BAD_REQUEST,
+      );
+    }
+
+    const uploadResult = await uploadAndCompressImage(req.file);
+
+    returnSuccessResponse(res, StatusCodes.CREATED, uploadResult);
   },
 );

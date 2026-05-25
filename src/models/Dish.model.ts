@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const AddOnSchema = new Schema({
   name: { type: String, ref: "Dish", required: true },
   price: { type: Number, required: true },
+  image: { type: String },
 });
 
 const DishSchema = new Schema({
@@ -32,6 +33,8 @@ const DishSchema = new Schema({
   },
   addOns: { type: [AddOnSchema], default: [] },
   prepTime: { type: Number, required: true },
+  rating: { type: Number, default: 0 },
+  image: { type: String },
   restaurantId: { type: String, required: true },
 });
 

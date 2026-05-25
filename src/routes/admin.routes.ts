@@ -14,6 +14,7 @@ import {
   updateOrderController,
   updateRestaurantController,
   updateTicketController,
+  uploadImageController,
 } from "../controllers/admin.controller";
 import { validate } from "../middlewares/validate.middleware";
 import { DishSchema } from "../schemas/dish.schema";
@@ -23,6 +24,7 @@ import { FlashDealSchema } from "../schemas/flashDeal.schema";
 import { getDishesController } from "../controllers/dish.controller";
 import { TicketSchema } from "../schemas/ticket.schema";
 import { getOffersController } from "../controllers/offer.controller";
+import { uploadMiddleware } from "../middlewares/upload.middlewear";
 
 const router = Router();
 
@@ -52,5 +54,11 @@ router.post("/raise-ticket", validate(TicketSchema), raiseTicketController);
 router.put("/update-ticket/:ticketId", updateTicketController);
 
 router.put("/update-restaurant/:restaurantId", updateRestaurantController);
+
+router.post(
+  "/upload-image",
+  uploadMiddleware.single("image"),
+  uploadImageController,
+);
 
 export default router;

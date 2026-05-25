@@ -3,6 +3,7 @@ import { z } from "zod";
 export const AddOnZodSchema = z.object({
   name: z.string(),
   price: z.number().positive("Price must be greater than 0"),
+  image: z.string().optional(),
 });
 
 export const DishSchema = z.object({
@@ -23,6 +24,8 @@ export const DishSchema = z.object({
     variants: z.array(z.string()).default([]),
     addOns: z.array(AddOnZodSchema).default([]),
     prepTime: z.number().positive(),
+    rating: z.number().default(0),
+    image: z.string().optional(),
     restaurantId: z.string(),
   }),
 });
