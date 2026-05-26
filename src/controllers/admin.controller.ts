@@ -59,7 +59,7 @@ export const updateDishController = asyncHandler(
   async (req: Request, res: Response) => {
     console.log("hellooo");
     const { dishId } = req.params; // Get id from URL params
-    const { name, price, category, variants, description, bestSeller } =
+    const { name, price, category, variants, description, bestSeller,available } =
       req.body;
 
     console.log("hello");
@@ -79,6 +79,7 @@ export const updateDishController = asyncHandler(
       variants,
       description,
       bestSeller,
+      available
     });
 
     // Handle case where service couldn't find the dish to update
