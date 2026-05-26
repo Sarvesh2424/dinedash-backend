@@ -38,7 +38,7 @@ interface IDish {
   image?: string;
   restaurantId: string;
   bestSeller?: boolean;
-  available:boolean
+  available: boolean;
 }
 
 export const addDish = async (data: IDish) => {
@@ -332,6 +332,30 @@ export const addFlashDeal = async (data: IFlashDeal) => {
   }
 };
 
+export const updateFlashDeal = async (
+  flashDealId: string | string[],
+  data: Partial<IFlashDeal>,
+) => {
+  try {
+    const deletedDeal = await FlashDeal.findOneAndUpdate(
+      {
+        flashDealId: flashDealId,
+      },
+      { $set: data },
+      { new: true, runValidators: true },
+    );
+    
+    return deletedDeal;
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Unknown data tier malfunction";
+    throw new AppError(
+      `Database exception wiping flash deal record: ${message}`,
+      StatusCodes.BAD_REQUEST,
+    );
+  }
+};
+
 export const deleteFlashDeal = async (flashDealId: string | string[]) => {
   try {
     const deletedDeal = await FlashDeal.findOneAndDelete({
@@ -348,7 +372,7 @@ export const deleteFlashDeal = async (flashDealId: string | string[]) => {
   }
 };
 
-export const getAllOrders = async (filters:Record<string, any> = {}) => {
+export const getAllOrders = async (filters: Record<string, any> = {}) => {
   try {
     const orders = await Order.find(filters).sort({ orderTime: -1 }).lean(); // .lean() converts documents into lightweight JSON for faster API performance
 

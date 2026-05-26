@@ -16,6 +16,7 @@ import {
   raiseTicket,
   updateCourier,
   updateDish,
+  updateFlashDeal,
   updateOrderStatus,
   updateRestaurantProfile,
   updateTicket,
@@ -269,6 +270,31 @@ export const addFlashDealController = asyncHandler(
       quantity,
       duration,
       active: true,
+    });
+
+    returnSuccessResponse(res, StatusCodes.CREATED, newFlashDeal);
+  },
+);
+
+export const updateFlashDealController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { flashDealId } = req.params;
+
+    if (!flashDealId) {
+      throw new AppError(
+        "Flash Deal ID path variable is required",
+        StatusCodes.BAD_REQUEST,
+      );
+    }
+
+    const { dish, discount, duration, quantity, active } = req.body;
+
+    const newFlashDeal = await updateFlashDeal(flashDealId, {
+      dish,
+      discount,
+      quantity,
+      duration,
+      active,
     });
 
     returnSuccessResponse(res, StatusCodes.CREATED, newFlashDeal);

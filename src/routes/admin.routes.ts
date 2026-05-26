@@ -12,6 +12,7 @@ import {
   raiseTicketController,
   updateCourierController,
   updateDishController,
+  updateFlashDealController,
   updateOrderController,
   updateRestaurantController,
   updateTicketController,
@@ -46,6 +47,11 @@ router.post(
   "/add-flashDeal",
   validate(FlashDealSchema),
   addFlashDealController,
+);
+router.put(
+  "/update-flashDeal",
+  validate(FlashDealSchema),
+  updateFlashDealController,
 );
 router.delete("/delete-flashDeal/:flashDealId", deleteFlashDealController);
 
