@@ -7,18 +7,32 @@ import { User } from "../models/User.models";
 import { ICartItem } from "../schemas/user.schema";
 import { Restaurant } from "../models/Restaurant.model";
 
-interface IOrder {
+interface IOrderInput {
   userId: string;
-  items: { dishId: string; quantity: number }[];
+  channel?: "Direct" | "Aggregator" | "Dine-in";
+  items: { 
+    dishId: string; 
+    quantity: number; 
+    notes?: string; 
+  }[];
 }
 
-export const placeOrder = async (data: IOrder) => {
+export const placeOrder = async (data: IOrderInput) => {
   try {
+    // Snapshot User Details to satisfy the new validation constraints
+    const liveUserData = await User.findOne({ userId: data.userId });
+    if (!liveUserData) {
+      throw new AppError(
+        `Order Processing Aborted: User account '${data.userId}' does not exist.`,
+        StatusCodes.NOT_FOUND,
+      );
+    }
+
     let calculatedTotal = 0;
     let calculatedPrepTime = 0;
     const itemsWithSnapshots = [];
 
-    // Pricing Engine verification: Loop over the basket array items securely
+    // Pricing Engine & Snapshot Compilation Loop
     for (const item of data.items) {
       const liveDishData = await Dish.findOne({ dishId: item.dishId });
 
@@ -28,11 +42,14 @@ export const placeOrder = async (data: IOrder) => {
           StatusCodes.NOT_FOUND,
         );
       }
+
       calculatedTotal += liveDishData.price * item.quantity;
       calculatedPrepTime += liveDishData.prepTime;
+
       itemsWithSnapshots.push({
         dishId: item.dishId,
         quantity: item.quantity,
+        notes: item.notes || "", // Injected custom client instruction support notes
         dishDetails: {
           dishId: liveDishData.dishId,
           name: liveDishData.name,
@@ -43,34 +60,38 @@ export const placeOrder = async (data: IOrder) => {
       });
     }
 
-    const orderId = v4();
     const finalizedOrderPayload = {
-      orderId,
-      ...data,
+      orderId: v4(),
+      userId: data.userId,
       status: "New",
       items: itemsWithSnapshots,
       total: Number(calculatedTotal.toFixed(2)),
       prepTime: Number(calculatedPrepTime.toFixed(2)),
       orderTime: new Date(),
+      isUrgent: false,
+      channel: data.channel || "Direct", // Injected with default fallback handler
+      courierId: undefined, // Freshly initialized without delivery allocation mappings
+      userDetails: {
+        userId: liveUserData.userId,
+        name: liveUserData.name,
+        mobile: liveUserData.mobile,
+        address: liveUserData.address || "",
+        image: liveUserData.image || "",
+      },
     };
 
+    // 4. Persist document template execution tree straight into database storage
     const newOrder = new Order(finalizedOrderPayload);
     await newOrder.save();
 
-    const populatedOrder = await Order.findById(newOrder._id)
-      .populate({
-        path: "items.dishDetails", // Path to the field inside the schema array
-        model: "Dish", // Target collection model definition name
-        select: "name price category image description", // Explicit parameters to expose
-      })
-      .lean();
+    // 5. Query out the lean clean snapshot output instance (Populate removed as data is captured inline)
+    const activeCleanRecord = await Order.findById(newOrder._id).lean();
+    return activeCleanRecord;
 
-    return populatedOrder;
   } catch (error: unknown) {
     if (error instanceof AppError) throw error;
 
-    const message =
-      error instanceof Error ? error.message : "Unknown order engine failure";
+    const message = error instanceof Error ? error.message : "Unknown order engine failure";
     throw new AppError(
       `Order Processing Aborted: ${message}`,
       StatusCodes.BAD_REQUEST,
