@@ -37,6 +37,7 @@ interface IDish {
   rating: number;
   image?: string;
   restaurantId: string;
+  bestSeller?: boolean;
 }
 
 export const addDish = async (data: IDish) => {
@@ -491,7 +492,7 @@ export const uploadAndCompressImage = async (file: Express.Multer.File) => {
   if (!bucketName) {
     throw new AppError(
       "AWS_BUCKET_NAME is missing from your server environment variables.",
-      StatusCodes.INTERNAL_SERVER_ERROR
+      StatusCodes.INTERNAL_SERVER_ERROR,
     );
   }
 
@@ -503,11 +504,11 @@ export const uploadAndCompressImage = async (file: Express.Multer.File) => {
   // Run Lossless Compression using Sharp based on structural type evaluation
   if (file.mimetype === "image/png") {
     compressedBuffer = await sharp(file.buffer)
-      .png({ compressionLevel: 9, palette: true, effort: 6 }) 
+      .png({ compressionLevel: 9, palette: true, effort: 6 })
       .toBuffer();
   } else if (file.mimetype === "image/webp") {
     compressedBuffer = await sharp(file.buffer)
-      .webp({ lossless: true }) 
+      .webp({ lossless: true })
       .toBuffer();
   }
 

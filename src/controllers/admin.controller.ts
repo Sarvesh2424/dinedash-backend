@@ -47,6 +47,7 @@ export const addDishController = asyncHandler(
       rating,
       image,
       restaurantId,
+      bestSeller: false,
     });
     returnSuccessResponse(res, StatusCodes.CREATED, newEditor);
   },
@@ -56,7 +57,8 @@ export const updateDishController = asyncHandler(
   async (req: Request, res: Response) => {
     console.log("hellooo");
     const { dishId } = req.params; // Get id from URL params
-    const { name, price, category, variants, description } = req.body;
+    const { name, price, category, variants, description, bestSeller } =
+      req.body;
 
     console.log("hello");
     // Check if the target dish exists/id is provided
@@ -74,6 +76,7 @@ export const updateDishController = asyncHandler(
       category,
       variants,
       description,
+      bestSeller,
     });
 
     // Handle case where service couldn't find the dish to update
