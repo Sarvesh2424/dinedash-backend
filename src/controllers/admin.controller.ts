@@ -59,8 +59,15 @@ export const updateDishController = asyncHandler(
   async (req: Request, res: Response) => {
     console.log("hellooo");
     const { dishId } = req.params; // Get id from URL params
-    const { name, price, category, variants, description, bestSeller,available } =
-      req.body;
+    const {
+      name,
+      price,
+      category,
+      variants,
+      description,
+      bestSeller,
+      available,
+    } = req.body;
 
     console.log("hello");
     // Check if the target dish exists/id is provided
@@ -79,7 +86,7 @@ export const updateDishController = asyncHandler(
       variants,
       description,
       bestSeller,
-      available
+      available,
     });
 
     // Handle case where service couldn't find the dish to update
@@ -254,12 +261,14 @@ export const deleteCourierController = asyncHandler(
 
 export const addFlashDealController = asyncHandler(
   async (req: Request, res: Response) => {
-    const { dish, discount, quantity } = req.body;
+    const { dish, discount, duration, quantity } = req.body;
 
     const newFlashDeal = await addFlashDeal({
       dish,
       discount,
       quantity,
+      duration,
+      active: true,
     });
 
     returnSuccessResponse(res, StatusCodes.CREATED, newFlashDeal);
