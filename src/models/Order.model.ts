@@ -31,7 +31,7 @@ const OrderSchema = new Schema({
   userDetails: { type: UserDetailSchema, required: true },
   status: {
     type: String,
-    enum: ["New", "Preparing", "Ready", "Completed", "Rejected"],
+    enum: ["New", "Preparing", "Ready", "Picked", "Completed", "Rejected"],
     default: "New",
     required: true,
   },

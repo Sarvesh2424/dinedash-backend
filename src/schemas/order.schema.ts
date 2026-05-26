@@ -12,7 +12,7 @@ export const OrderSchema = z.object({
   body: z.object({
     userId: z.string().min(1, "User ID is required"),
     status: z
-      .enum(["New", "Preparing", "Ready", "Completed", "Rejected"])
+      .enum(["New", "Preparing", "Ready", "Picked", "Completed", "Rejected"])
       .default("New"),
     items: z
       .array(OrderItemZodSchema)
