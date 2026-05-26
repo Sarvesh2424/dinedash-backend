@@ -155,6 +155,7 @@ export const addOfferController = asyncHandler(
       startDate,
       endDate,
       image,
+      active: true,
       restaurantId,
     });
 

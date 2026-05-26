@@ -18,6 +18,7 @@ const OfferSchema = new Schema({
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   image: { type: String },
+  active: { type: Boolean, default: true },
   restaurantId: { type: String, ref: "Restaurant", required: true },
 });
 

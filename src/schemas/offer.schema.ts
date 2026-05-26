@@ -13,6 +13,7 @@ export const OfferSchema = z
       startDate: z.coerce.date(),
       endDate: z.coerce.date(),
       image: z.string().optional(),
+      active:z.boolean().default(true),
       restaurantId: z.string(),
     }),
   })
