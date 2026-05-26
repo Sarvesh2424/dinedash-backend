@@ -38,6 +38,7 @@ interface IDish {
   image?: string;
   restaurantId: string;
   bestSeller?: boolean;
+  available:boolean
 }
 
 export const addDish = async (data: IDish) => {

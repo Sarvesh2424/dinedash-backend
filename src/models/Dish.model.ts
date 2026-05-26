@@ -37,6 +37,7 @@ const DishSchema = new Schema({
   image: { type: String },
   restaurantId: { type: String, required: true },
   bestSeller: { type: Boolean, default: false },
+  available: { type: Boolean, required: true, default: true },
 });
 
 export const Dish = mongoose.model("Dish", DishSchema);

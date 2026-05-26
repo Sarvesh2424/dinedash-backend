@@ -49,6 +49,7 @@ export const addDishController = asyncHandler(
       image,
       restaurantId,
       bestSeller: false,
+      available: true,
     });
     returnSuccessResponse(res, StatusCodes.CREATED, newEditor);
   },
@@ -440,10 +441,6 @@ export const getOrdersController = asyncHandler(
 
     const orders = await getAllOrders(filters);
 
-    return returnSuccessResponse(
-      res, 
-      StatusCodes.OK, 
-      orders
-    );
-  }
+    return returnSuccessResponse(res, StatusCodes.OK, orders);
+  },
 );

@@ -28,5 +28,6 @@ export const DishSchema = z.object({
     image: z.string().optional(),
     restaurantId: z.string(),
     bestSeller: z.boolean().optional(),
+    available: z.boolean().default(true),
   }),
 });
