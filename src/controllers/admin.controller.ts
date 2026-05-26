@@ -267,17 +267,13 @@ export const getFlashDealsController = asyncHandler(
 
     const deals = await getAllFlashDeals(filters);
 
-    return returnSuccessResponse(
-      res,
-      StatusCodes.OK,
-      deals
-    );
-  }
+    return returnSuccessResponse(res, StatusCodes.OK, deals);
+  },
 );
 
 export const addFlashDealController = asyncHandler(
   async (req: Request, res: Response) => {
-    const { dish, discount, duration, quantity } = req.body;
+    const { dish, discount, duration, quantity, restaurantId } = req.body;
 
     const newFlashDeal = await addFlashDeal({
       dish,
@@ -285,6 +281,7 @@ export const addFlashDealController = asyncHandler(
       quantity,
       duration,
       active: true,
+      restaurantId,
     });
 
     returnSuccessResponse(res, StatusCodes.CREATED, newFlashDeal);

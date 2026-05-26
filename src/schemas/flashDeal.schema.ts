@@ -12,6 +12,7 @@ export const FlashDealSchema = z.object({
     sold: z.number().optional(),
     active: z.boolean().default(true),
     startedAt: z.date().optional(),
+    restaurantId: z.string(),
   }),
 });
 

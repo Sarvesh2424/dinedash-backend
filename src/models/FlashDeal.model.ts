@@ -11,6 +11,7 @@ const FlashDealSchema = new Schema({
   sold: { type: Number, default: 0 },
   active: { type: Boolean, required: true, default: true },
   startedAt: { type: Date, default: Date.now() },
+  restaurantId: { type: String, required: true },
 });
 
 export const FlashDeal = mongoose.model("FlashDeal", FlashDealSchema);
