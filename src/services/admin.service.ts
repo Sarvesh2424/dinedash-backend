@@ -347,6 +347,20 @@ export const deleteFlashDeal = async (flashDealId: string | string[]) => {
   }
 };
 
+export const getAllOrders = async (filters:Record<string, any> = {}) => {
+  try {
+    const orders = await Order.find(filters).sort({ orderTime: -1 }).lean(); // .lean() converts documents into lightweight JSON for faster API performance
+
+    return orders;
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Database fetch pipeline failure";
+    throw new Error(`Failed to retrieve orders record matrix: ${message}`);
+  }
+};
+
 const ALLOWED_STATUSES = ["New", "Preparing", "Ready", "Completed", "Rejected"];
 
 export const updateOrderStatus = async (

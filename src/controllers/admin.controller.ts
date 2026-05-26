@@ -12,6 +12,7 @@ import {
   deleteDish,
   deleteFlashDeal,
   deleteOffer,
+  getAllOrders,
   raiseTicket,
   updateCourier,
   updateDish,
@@ -431,4 +432,18 @@ export const uploadImageController = asyncHandler(
 
     returnSuccessResponse(res, StatusCodes.CREATED, uploadResult);
   },
+);
+
+export const getOrdersController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const filters = req.query;
+
+    const orders = await getAllOrders(filters);
+
+    return returnSuccessResponse(
+      res, 
+      StatusCodes.OK, 
+      orders
+    );
+  }
 );

@@ -8,6 +8,7 @@ import {
   deleteDishController,
   deleteFlashDealController,
   deleteOfferController,
+  getOrdersController,
   raiseTicketController,
   updateCourierController,
   updateDishController,
@@ -48,6 +49,7 @@ router.post(
 );
 router.delete("/delete-flashDeal/:flashDealId", deleteFlashDealController);
 
+router.get("/get-orders",getOrdersController)
 router.put("/update-order/:orderId", updateOrderController);
 
 router.post("/raise-ticket", validate(TicketSchema), raiseTicketController);
