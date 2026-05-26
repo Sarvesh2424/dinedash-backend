@@ -56,6 +56,8 @@ export const RestaurantSchema = z.object({
     tickets: z.array(z.string()).default([]),
     images: z.array(z.string()).default([]),
     rating: z.number().optional().default(0.0),
+    flashText: z.string().optional(),
+    tags: z.array(z.string()).optional(),
   }),
 });
 

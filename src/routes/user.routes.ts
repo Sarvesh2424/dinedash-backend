@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  getDistanceController,
   getOrdersController,
   getRestaurantsController,
   placeOrderController,
@@ -22,5 +23,7 @@ router.put("/update-cart/:userId", updateCartController);
 router.get("/get-offers", getOffersController);
 
 router.get("/get-restaurants", getRestaurantsController);
+
+router.get("/get-distances", getDistanceController);
 
 export default router;
