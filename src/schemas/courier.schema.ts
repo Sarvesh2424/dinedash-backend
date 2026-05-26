@@ -3,7 +3,7 @@ import { z } from "zod";
 export const CourierSchema = z.object({
   body: z.object({
     name: z.string().min(1, "Name is required"),
-    status: z.enum(["Free", "On Run"]).default("Free"),
+    status: z.enum(["Free", "On Run","Offline"]).default("Free"),
     // Validates phone numbers (supports formats like +123456789, 10 digits, dashes, etc.)
     mobile: z
       .string()

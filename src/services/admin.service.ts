@@ -184,6 +184,20 @@ export const deleteOffer = async (offerId: string | string[]) => {
   }
 };
 
+export const getAllCouriers = async (filters: Record<string, any> = {}) => {
+  try {
+    const couriers = await Courier.find(filters)
+      .sort({ name: 1 }) // Alphabetical sorting by default
+      .lean();
+
+    return couriers;
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Database fetch failure";
+    throw new Error(`Failed to retrieve couriers matrix data: ${message}`);
+  }
+};
+
 export const addCourier = async (data: ICourier) => {
   try {
     // Prevent the same telephone number from creating duplicate profiles
@@ -302,7 +316,8 @@ export const getAllFlashDeals = async (filters: Record<string, any> = {}) => {
 
     return deals;
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Database fetch failure";
+    const message =
+      error instanceof Error ? error.message : "Database fetch failure";
     throw new Error(`Failed to retrieve flash deals registry logs: ${message}`);
   }
 };

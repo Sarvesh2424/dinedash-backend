@@ -12,6 +12,7 @@ import {
   deleteDish,
   deleteFlashDeal,
   deleteOffer,
+  getAllCouriers,
   getAllFlashDeals,
   getAllOrders,
   raiseTicket,
@@ -188,6 +189,19 @@ export const deleteOfferController = asyncHandler(
       offerId,
     });
   },
+);
+
+export const getCouriersController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const filters = req.query;
+    const couriers = await getAllCouriers(filters);
+
+    return returnSuccessResponse(
+      res,
+      StatusCodes.OK,
+      couriers
+    );
+  }
 );
 
 export const addCourierController = asyncHandler(

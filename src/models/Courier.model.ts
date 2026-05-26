@@ -7,7 +7,7 @@ const CourierSchema = new Schema({
   name: { type: String, required: true },
   status: {
     type: String,
-    enum: ["Free", "On Run"],
+    enum: ["Free", "On Run", "Offline"],
     required: true,
     default: "Free",
   },
