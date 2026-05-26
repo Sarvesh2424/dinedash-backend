@@ -16,6 +16,7 @@ export const placeOrder = async (data: IOrder) => {
   try {
     let calculatedTotal = 0;
     let calculatedPrepTime = 0;
+    const itemsWithSnapshots = [];
 
     // Pricing Engine verification: Loop over the basket array items securely
     for (const item of data.items) {
@@ -29,6 +30,17 @@ export const placeOrder = async (data: IOrder) => {
       }
       calculatedTotal += liveDishData.price * item.quantity;
       calculatedPrepTime += liveDishData.prepTime;
+      itemsWithSnapshots.push({
+        dishId: item.dishId,
+        quantity: item.quantity,
+        dishDetails: {
+          dishId: liveDishData.dishId,
+          name: liveDishData.name,
+          price: liveDishData.price,
+          category: liveDishData.category,
+          image: liveDishData.image,
+        },
+      });
     }
 
     const orderId = v4();
@@ -36,6 +48,7 @@ export const placeOrder = async (data: IOrder) => {
       orderId,
       ...data,
       status: "New",
+      items: itemsWithSnapshots,
       total: Number(calculatedTotal.toFixed(2)),
       prepTime: Number(calculatedPrepTime.toFixed(2)),
       orderTime: new Date(),
@@ -44,7 +57,15 @@ export const placeOrder = async (data: IOrder) => {
     const newOrder = new Order(finalizedOrderPayload);
     await newOrder.save();
 
-    return newOrder;
+    const populatedOrder = await Order.findById(newOrder._id)
+      .populate({
+        path: "items.dishDetails", // Path to the field inside the schema array
+        model: "Dish", // Target collection model definition name
+        select: "name price category image description", // Explicit parameters to expose
+      })
+      .lean();
+
+    return populatedOrder;
   } catch (error: unknown) {
     if (error instanceof AppError) throw error;
 
@@ -117,9 +138,7 @@ export const getAllRestaurants = async (filters: Record<string, any> = {}) => {
 export const getAllOrders = async (filters: Record<string, any> = {}) => {
   try {
     // Execute lookup query, sorting by newest records first
-    const orders = await Order.find(filters)
-      .sort({ createdAt: -1 })
-      .lean();
+    const orders = await Order.find(filters).sort({ createdAt: -1 }).lean();
 
     return orders;
   } catch (error: unknown) {

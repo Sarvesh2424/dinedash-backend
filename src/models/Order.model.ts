@@ -2,9 +2,18 @@ import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
+const OrderItemDetailSchema = new Schema({
+  dishId: { type: String, required: true },
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  category: { type: String },
+  image: { type: String },
+});
+
 const OrderItemSchema = new Schema({
   dishId: { type: String, ref: "Dish", required: true },
   quantity: { type: Number, required: true },
+  dishDetails: { type: OrderItemDetailSchema, required: true },
 });
 
 const OrderSchema = new Schema({
