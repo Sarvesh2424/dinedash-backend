@@ -8,6 +8,7 @@ import {
   deleteDishController,
   deleteFlashDealController,
   deleteOfferController,
+  getFlashDealsController,
   getOrdersController,
   raiseTicketController,
   updateCourierController,
@@ -43,6 +44,8 @@ router.post("/add-courier", validate(CourierSchema), addCourierController);
 router.put("/update-courier/:courierId", updateCourierController);
 router.delete("/delete-courier/:courierId", deleteCourierController);
 
+
+router.get("/get-flashDeals",getFlashDealsController)
 router.post(
   "/add-flashDeal",
   validate(FlashDealSchema),

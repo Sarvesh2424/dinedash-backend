@@ -294,6 +294,19 @@ export const deleteCourier = async (courierId: string | string[]) => {
   }
 };
 
+export const getAllFlashDeals = async (filters: Record<string, any> = {}) => {
+  try {
+    const deals = await FlashDeal.find(filters)
+      .sort({ createdAt: -1 }) // Show newly created promo runs first
+      .lean();
+
+    return deals;
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Database fetch failure";
+    throw new Error(`Failed to retrieve flash deals registry logs: ${message}`);
+  }
+};
+
 export const addFlashDeal = async (data: IFlashDeal) => {
   try {
     // Foreign Key Check: Make sure the target dish exists before creating a deal for it
@@ -344,7 +357,7 @@ export const updateFlashDeal = async (
       { $set: data },
       { new: true, runValidators: true },
     );
-    
+
     return deletedDeal;
   } catch (error: unknown) {
     const message =
