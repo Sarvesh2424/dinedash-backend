@@ -11,5 +11,6 @@ router.use("/admin", adminRoutes);
 router.use("/user", userRoutes);
 router.use("/register", registerRoutes);
 router.use("/login", loginRoutes);
+router.use("/logout", logoutRouts);
 
 export default router;
