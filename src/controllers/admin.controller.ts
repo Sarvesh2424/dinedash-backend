@@ -436,7 +436,15 @@ export const raiseTicketController = asyncHandler(
 export const updateTicketController = asyncHandler(
   async (req: Request, res: Response) => {
     const { ticketId } = req.params;
-    const { status, priority, message, subject } = req.body;
+    const {
+      status,
+      priority,
+      messages,
+      assignedTo,
+      subject,
+      updatedAt,
+      resolvedAt,
+    } = req.body;
 
     if (!ticketId) {
       throw new AppError(
@@ -448,8 +456,11 @@ export const updateTicketController = asyncHandler(
     const updatedTicket = await updateTicket(ticketId, {
       status,
       priority,
-      message,
+      messages,
+      assignedTo,
       subject,
+      updatedAt,
+      resolvedAt,
     });
 
     if (!updatedTicket) {
