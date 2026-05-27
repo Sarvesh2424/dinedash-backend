@@ -452,14 +452,11 @@ export const updateOrderStatus = async (
 };
 
 export const getTicketsService = async (filters: Record<string, any> = {}) => {
-  const ticketsList = await Ticket.find(filters).sort({ updatedAt: -1 }).lean();
-
-  return ticketsList || [];
+  return (await Ticket.find(filters).sort({ updatedAt: -1 }).lean()) || [];
 };
 
-export const raiseTicket = async (data: ITicket) => {
+export const raiseTicket = async (data: any) => {
   try {
-    // Data Integrity Check: If an order invoice is referenced, verify it exists
     if (data.orderReference) {
       const parentOrderExists = await Order.findOne({
         orderId: data.orderReference,
@@ -467,7 +464,7 @@ export const raiseTicket = async (data: ITicket) => {
 
       if (!parentOrderExists) {
         throw new AppError(
-          `Integrity Verification Failure: Referenced order reference ID '${data.orderReference}' does not exist.`,
+          `Integrity Verification Failure: Referenced order ID '${data.orderReference}' does not exist.`,
           StatusCodes.NOT_FOUND,
         );
       }
@@ -475,23 +472,26 @@ export const raiseTicket = async (data: ITicket) => {
 
     const ticketId = v4();
 
-    const restaurant = await Restaurant.findOneAndUpdate(
+    // Register ticket identifier into the parent restaurant scope
+    await Restaurant.findOneAndUpdate(
       { restaurantId: data.restaurantId },
       { $push: { tickets: ticketId } },
-      { new: true },
     );
 
-    const newTicket = new Ticket({ ticketId, ...data });
-    await newTicket.save();
+    // Construct and save the final complete ticket model document instance
+    const newTicket = new Ticket({
+      ticketId,
+      ...data,
+      status: data.status || "Open",
+      messages: data.messages || [],
+    });
 
+    await newTicket.save();
     return newTicket;
   } catch (error: unknown) {
     if (error instanceof AppError) throw error;
-
     const message =
-      error instanceof Error
-        ? error.message
-        : "Unknown support database transaction error";
+      error instanceof Error ? error.message : "Unknown database error";
     throw new AppError(
       `Failed to log support ticket: ${message}`,
       StatusCodes.BAD_REQUEST,
@@ -501,28 +501,41 @@ export const raiseTicket = async (data: ITicket) => {
 
 export const updateTicket = async (
   ticketId: string | string[],
-  data: Partial<ITicket>,
+  data: Record<string, any>,
 ) => {
   try {
-    // Append a fresh system runtime timestamp to track this modification event
-    const modifiedPayload = {
-      ...data,
-      updatedAt: new Date(),
-    };
+    // Handle batch/array safety checks for target queries
+    const queryFilter = Array.isArray(ticketId)
+      ? { ticketId: { $in: ticketId } }
+      : { ticketId: ticketId };
 
-    // Execute atomic update operation matching against our unique string ticketId
+    // Dynamic resolution timestamp lifecycle interceptor
+    let updatePayload: Record<string, any> = { $set: data };
+
+    if (data.status === "Resolved") {
+      updatePayload.$set.resolvedAt = new Date();
+    } else if (data.status && data.status !== "Resolved") {
+      // If reopening or changing to 'In progress', safely strip previous resolution timestamps
+      updatePayload.$unset = { resolvedAt: "" };
+    }
+
+    // If processing a multi-update array, switch from findOne to updateMany execution tracks
+    if (Array.isArray(ticketId)) {
+      return await Ticket.updateMany(queryFilter, updatePayload, {
+        runValidators: true,
+      });
+    }
+
     const updatedTicket = await Ticket.findOneAndUpdate(
-      { ticketId: ticketId },
-      { $set: modifiedPayload },
-      { new: true, runValidators: true }, // Returns the modified object and enforces enum lookups
+      queryFilter,
+      updatePayload,
+      { new: true, runValidators: true },
     );
 
     return updatedTicket;
   } catch (error: unknown) {
     const message =
-      error instanceof Error
-        ? error.message
-        : "Unknown database mutation fault";
+      error instanceof Error ? error.message : "Unknown mutation fault";
     throw new AppError(
       `Failed to modify ticket record state: ${message}`,
       StatusCodes.BAD_REQUEST,

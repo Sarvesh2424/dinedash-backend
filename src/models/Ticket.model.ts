@@ -1,7 +1,16 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const Schema = mongoose.Schema;
+// Sub-schema for Ticket Attachments
+const TicketAttachmentSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    size: { type: String, required: true },
+    url: { type: String, required: true },
+  },
+  { _id: false }
+);
 
+// Sub-schema for Ticket Messages
 const TicketMessageSchema = new Schema(
   {
     messageId: { 
@@ -17,11 +26,23 @@ const TicketMessageSchema = new Schema(
     authorName: { type: String },
     text: { type: String, required: true },
     at: { type: Date, default: Date.now },
-    internal: { type: Boolean, default: false }
+    internal: { type: Boolean, default: false },
+    attachments: { type: [TicketAttachmentSchema], default: [] }
   },
-  { _id: false } // Prevents Mongoose from generating a redundant secondary nested _id
+  { _id: false }
 );
 
+// Sub-schema for User metadata details
+const TicketUserSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String },
+  },
+  { _id: false }
+);
+
+// Main Ticket Schema
 const TicketSchema = new Schema(
   {
     ticketId: { type: String, required: true, unique: true },
@@ -58,14 +79,16 @@ const TicketSchema = new Schema(
       default: "Open",
       required: true,
     },
+    assignedTo: { type: String, default: "Unassigned" },
+    user: { type: TicketUserSchema, required: true },   
     orderReference: { type: String, ref: "Order" },
     restaurantId: { type: String, required: true },
-
+    resolvedAt: { type: Date },
     messages: { type: [TicketMessageSchema], default: [] }
   },
   {
-    timestamps: true, // Manages native 'createdAt' and 'updatedAt' constraints automatically
+    timestamps: true, // Automatically manages createdAt and updatedAt
   }
 );
 
-export const Ticket = mongoose.model("Ticket", TicketSchema);
+export const Ticket = mongoose.models.Ticket || mongoose.model("Ticket", TicketSchema);
