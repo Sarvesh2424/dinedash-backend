@@ -11,6 +11,7 @@ import {
   getCouriersController,
   getFlashDealsController,
   getOrdersController,
+  getRestaurantController,
   raiseTicketController,
   updateCourierController,
   updateDishController,
@@ -65,6 +66,7 @@ router.put("/update-order/:orderId", updateOrderController);
 router.post("/raise-ticket", validate(TicketSchema), raiseTicketController);
 router.put("/update-ticket/:ticketId", updateTicketController);
 
+router.get("/get-restaurant", getRestaurantController);
 router.put("/update-restaurant/:restaurantId", updateRestaurantController);
 
 router.post(

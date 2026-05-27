@@ -25,6 +25,8 @@ const RestaurantSchema = new Schema({
   restaurantId: { type: String, required: true },
   name: { type: String, required: true },
   password: { type: String, required: true },
+  ownerName: { type: String, required: true },
+  email: { type: String, required: true },
   mobile: { type: String, required: true },
   address: { type: String, required: true },
   cuisine: { type: String, required: true },

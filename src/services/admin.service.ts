@@ -524,6 +524,22 @@ export const updateTicket = async (
   }
 };
 
+export const getRestaurantService = async (filters: Record<string, any> = {}) => {
+  const liveRestaurant = await Restaurant.findOne(filters).lean();
+
+  if (!liveRestaurant) {
+    throw new AppError(
+      `Profile Hydration Aborted: Restaurant matching identifier does not exist or was deleted.`,
+      StatusCodes.NOT_FOUND
+    );
+  }
+
+  // Security boundary: Remove sensitive authentication password hashes before returning the object to the client
+  const { password, ...sanitizedProfile } = liveRestaurant;
+
+  return sanitizedProfile;
+};
+
 export const updateRestaurantProfile = async (
   restaurantId: string | string[],
   data: Partial<IRestaurant>,

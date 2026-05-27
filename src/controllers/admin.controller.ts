@@ -15,6 +15,7 @@ import {
   getAllCouriers,
   getAllFlashDeals,
   getAllOrders,
+  getRestaurantService,
   raiseTicket,
   updateCourier,
   updateDish,
@@ -196,12 +197,8 @@ export const getCouriersController = asyncHandler(
     const filters = req.query;
     const couriers = await getAllCouriers(filters);
 
-    return returnSuccessResponse(
-      res,
-      StatusCodes.OK,
-      couriers
-    );
-  }
+    return returnSuccessResponse(res, StatusCodes.OK, couriers);
+  },
 );
 
 export const addCourierController = asyncHandler(
@@ -445,6 +442,24 @@ export const updateTicketController = asyncHandler(
     returnSuccessResponse(res, StatusCodes.OK, updatedTicket);
   },
 );
+
+export const getRestaurantController = async (req: Request, res: Response) => {
+  try {
+    const filters = req.query;
+
+    const targetedRestaurantProfile = await getRestaurantService(filters);
+
+    // 3. Dispatch structured JSON data instance back to the client
+    res.status(StatusCodes.OK).json({
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: "Restaurant profile configurations hydrated successfully.",
+      result: targetedRestaurantProfile,
+    });
+  } catch (error: unknown) {
+    // Bubble network context errors down into your global Express middleware boundary error handler safely
+  }
+};
 
 export const updateRestaurantController = asyncHandler(
   async (req: Request, res: Response) => {

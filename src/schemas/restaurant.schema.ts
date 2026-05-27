@@ -22,6 +22,8 @@ export const RestaurantSchema = z.object({
     name: z.string().min(1, "Restaurant business name is required"),
 
     password: z.string().min(6, "Password must be at least 6 characters long"),
+    ownerName: z.string(),
+    email: z.string(),
 
     // Validates mobile numbers (e.g., standard 10 digits or E.164 formats)
     mobile: z
