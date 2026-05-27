@@ -24,13 +24,6 @@ export const TicketSchema = z.object({
     status: z.enum(["Open", "In progress", "Resolved"]).default("Open"),
     orderReference: z.string().optional(),
 
-    message: z
-      .string()
-      .min(
-        10,
-        "Please provide a more descriptive summary explanation (minimum 10 characters)",
-      ),
-
     updatedAt: z.coerce.date().default(() => new Date()),
     restaurantId: z.string(),
   }),
