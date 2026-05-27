@@ -484,6 +484,7 @@ export const raiseTicket = async (data: any) => {
       ...data,
       status: data.status || "Open",
       messages: data.messages || [],
+      user:data.user
     });
 
     await newTicket.save();

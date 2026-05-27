@@ -411,7 +411,8 @@ export const raiseTicketController = asyncHandler(
       issueType,
       priority,
       orderReference,
-      message,
+      user,
+      messages,
       restaurantId,
     } = req.body;
 
@@ -422,7 +423,8 @@ export const raiseTicketController = asyncHandler(
       priority,
       status: "Open",
       orderReference,
-      message,
+      user,
+      messages,
       updatedAt: new Date(),
       restaurantId,
     });
