@@ -72,6 +72,7 @@ export const updateDishController = asyncHandler(
       description,
       bestSeller,
       available,
+      prepTime,
     } = req.body;
 
     console.log("hello");
@@ -92,6 +93,7 @@ export const updateDishController = asyncHandler(
       description,
       bestSeller,
       available,
+      prepTime,
     });
 
     // Handle case where service couldn't find the dish to update
