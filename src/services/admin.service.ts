@@ -451,6 +451,12 @@ export const updateOrderStatus = async (
   }
 };
 
+export const getTicketsService = async (filters: Record<string, any> = {}) => {
+  const ticketsList = await Ticket.find(filters).sort({ updatedAt: -1 }).lean();
+
+  return ticketsList || [];
+};
+
 export const raiseTicket = async (data: ITicket) => {
   try {
     // Data Integrity Check: If an order invoice is referenced, verify it exists
@@ -524,13 +530,15 @@ export const updateTicket = async (
   }
 };
 
-export const getRestaurantService = async (filters: Record<string, any> = {}) => {
+export const getRestaurantService = async (
+  filters: Record<string, any> = {},
+) => {
   const liveRestaurant = await Restaurant.findOne(filters).lean();
 
   if (!liveRestaurant) {
     throw new AppError(
       `Profile Hydration Aborted: Restaurant matching identifier does not exist or was deleted.`,
-      StatusCodes.NOT_FOUND
+      StatusCodes.NOT_FOUND,
     );
   }
 

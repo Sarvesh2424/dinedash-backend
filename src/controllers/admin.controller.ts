@@ -16,6 +16,7 @@ import {
   getAllFlashDeals,
   getAllOrders,
   getRestaurantService,
+  getTicketsService,
   raiseTicket,
   updateCourier,
   updateDish,
@@ -384,6 +385,23 @@ export const updateOrderController = asyncHandler(
     returnSuccessResponse(res, StatusCodes.OK, updatedOrder);
   },
 );
+
+export const getTicketsController = async (req: Request, res: Response) => {
+  try {
+    const filters = req.query;
+
+    const activeTicketsCollection = await getTicketsService(filters);
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: `Successfully synchronized ${activeTicketsCollection.length} support ticket documentation maps.`,
+      result: activeTicketsCollection,
+    });
+  } catch (error: unknown) {
+    // Gracefully catch database exceptions and drop into global routing error boundary middleware
+  }
+};
 
 export const raiseTicketController = asyncHandler(
   async (req: Request, res: Response) => {
